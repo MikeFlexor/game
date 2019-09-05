@@ -1,7 +1,25 @@
-﻿const app = new PIXI.Application(800, 600, { transparent: true });
+const app = new PIXI.Application(800, 600, { transparent: true });
 document.body.appendChild(app.view);
 
-PIXI.loader.add('atlas', 'https://raw.githubusercontent.com/MikeFlexor/game/master/atlas/atlas.json');
+//PIXI.loader.add('atlas', 'https://raw.githubusercontent.com/MikeFlexor/game/master/atlas/atlas.json');
+PIXI.loader.add('images/wall.png');
+PIXI.loader.add('images/brick_1.png');
+PIXI.loader.add('images/brick_2.png');
+PIXI.loader.add('images/brick_3.png');
+PIXI.loader.add('images/back.png');
+PIXI.loader.add('images/fire_1.png');
+PIXI.loader.add('images/fire_2.png');
+PIXI.loader.add('images/fire_3.png');
+PIXI.loader.add('images/fire_4.png');
+PIXI.loader.add('images/player.png');
+PIXI.loader.add('images/bullet.png');
+PIXI.loader.add('images/bonus_ammo.png');
+PIXI.loader.add('images/bonus_key.png');
+PIXI.loader.add('images/door_close.png');
+PIXI.loader.add('images/door_open.png');
+PIXI.loader.add('images/menu_ammo.png');
+PIXI.loader.add('images/menu_key_true.png');
+PIXI.loader.add('images/menu_key_false.png');
 /*PIXI.loader.add('images/Бетон_1.png');
 PIXI.loader.add('images/Кирпич_1.png');
 PIXI.loader.add('images/Кирпич_2.png');
@@ -195,7 +213,8 @@ function setup() {
 	
 	for (let i = 0; i < 4; i++) {
 		//let fire = PIXI.loader.resources['images/Огонь_' + (i + 1) + '.png'].texture;
-		let fire = PIXI.Texture.fromFrame('fire_' + (i + 1) + '.png');
+		let fire = PIXI.loader.resources['images/fire_' + (i + 1) + '.png'].texture;
+		//let fire = PIXI.Texture.fromFrame('fire_' + (i + 1) + '.png');
 		fireTextures.push(fire);
 	}
 	
@@ -210,7 +229,8 @@ function setup() {
 			}
 			if (tileMap[i][j] == 1) {
 				//tile = new PIXI.Sprite(PIXI.loader.resources["images/Бетон_1.png"].texture);
-				tile = new PIXI.Sprite(PIXI.Texture.fromFrame('wall.png'));
+				tile = new PIXI.Sprite(PIXI.loader.resources["images/wall.png"].texture);
+				//tile = new PIXI.Sprite(PIXI.Texture.fromFrame('wall.png'));
 			}
 			if (tileMap[i][j] == 2) {
 				tile = new PIXI.Sprite();
@@ -231,7 +251,8 @@ function setup() {
 				door.x = j * tileSize;
 				door.y = (i - 2) * tileSize;
 				//door.sprite = new PIXI.Sprite(PIXI.loader.resources["images/Дверь_закр.png"].texture);
-				door.sprite = new PIXI.Sprite(PIXI.Texture.fromFrame('door_close.png'));
+				door.sprite = new PIXI.Sprite(PIXI.loader.resources["images/door_close.png"].texture);
+				//door.sprite = new PIXI.Sprite(PIXI.Texture.fromFrame('door_close.png'));
 				door.sprite.x = door.x;
 				door.sprite.y = door.y;
 				doors.push(door);
@@ -254,10 +275,12 @@ function setup() {
 				bonus.sway = Math.random() * 61;
 				if (bonus.type == 1) {
 					//bonus.sprite = new PIXI.Sprite(PIXI.loader.resources["images/БонусПатроны.png"].texture);
-					bonus.sprite = new PIXI.Sprite(PIXI.Texture.fromFrame('bonus_ammo.png'));
+					bonus.sprite = new PIXI.Sprite(PIXI.loader.resources["images/bonus_ammo.png"].texture);
+					//bonus.sprite = new PIXI.Sprite(PIXI.Texture.fromFrame('bonus_ammo.png'));
 				} else if (bonus.type == 2) {
 					//bonus.sprite = new PIXI.Sprite(PIXI.loader.resources["images/БонусКлюч.png"].texture);
-					bonus.sprite = new PIXI.Sprite(PIXI.Texture.fromFrame('bonus_key.png'));
+					bonus.sprite = new PIXI.Sprite(PIXI.loader.resources["images/bonus_key.png"].texture);
+					//bonus.sprite = new PIXI.Sprite(PIXI.Texture.fromFrame('bonus_key.png'));
 				}
 				bonus.sprite.x = bonus.x;
 				bonus.sprite.y = bonus.y;
@@ -266,7 +289,8 @@ function setup() {
 			}
 			if (tileMap[i][j] == 5) {
 				//tile = new PIXI.Sprite(PIXI.loader.resources["images/Кирпич_1.png"].texture);
-				tile = new PIXI.Sprite(PIXI.Texture.fromFrame('brick_1.png'));
+				tile = new PIXI.Sprite(PIXI.loader.resources["images/brick_1.png"].texture);
+				//tile = new PIXI.Sprite(PIXI.Texture.fromFrame('brick_1.png'));
 			}
 			if (tileMap[i][j] == 8) {
 				tile = new PIXI.extras.AnimatedSprite(fireTextures);
@@ -288,7 +312,8 @@ function setup() {
 	// ЗАГРУЗКА ТАЙЛОВОГО ФОНА
 	tilingSprite = new PIXI.extras.TilingSprite(
 		//PIXI.loader.resources["images/Панель_1.png"].texture,
-		PIXI.Texture.fromFrame('back.png'),
+		PIXI.loader.resources["images/back.png"].texture,
+		//PIXI.Texture.fromFrame('back.png'),
 		tiles.width,
 		tiles.height,
 	);
@@ -308,7 +333,8 @@ function setup() {
 	// ЗАГРУЗКА ИГРОКА
 	//const WIN_gift_mouseB = PIXI.Texture.fromFrame('WIN_gift_mouseB.png');
 	//player.sprite = new PIXI.Sprite(PIXI.loader.resources["images/Персонаж_3.png"].texture);
-	player.sprite = new PIXI.Sprite(PIXI.Texture.fromFrame('player.png'));
+	player.sprite = new PIXI.Sprite(PIXI.loader.resources["images/player.png"].texture);
+	//player.sprite = new PIXI.Sprite(PIXI.Texture.fromFrame('player.png'));
 	player.sprite.anchor.x = 0.5;
 	player.sprite.x = player.x;
 	player.sprite.y = player.y;
@@ -318,13 +344,15 @@ function setup() {
 	
 	
 	//menuAmmo = new PIXI.Sprite(PIXI.loader.resources["images/Меню_Патроны.png"].texture);
-	menuAmmo = new PIXI.Sprite(PIXI.Texture.fromFrame('menu_ammo.png'));
+	menuAmmo = new PIXI.Sprite(PIXI.loader.resources["images/menu_ammo.png"].texture);
+	//menuAmmo = new PIXI.Sprite(PIXI.Texture.fromFrame('menu_ammo.png'));
 	menuAmmo.x = 10;
 	menuAmmo.y = 10;
 	app.stage.addChild(menuAmmo);
 	
 	//menuKey = new PIXI.Sprite(PIXI.loader.resources["images/Меню_Ключ_Нет.png"].texture);
-	menuKey = new PIXI.Sprite(PIXI.Texture.fromFrame('menu_key_false.png'));
+	menuKey = new PIXI.Sprite(PIXI.loader.resources["images/menu_key_false.png"].texture);
+	//menuKey = new PIXI.Sprite(PIXI.Texture.fromFrame('menu_key_false.png'));
 	menuKey.x = 84;
 	menuKey.y = 10;
 	app.stage.addChild(menuKey);
@@ -464,13 +492,15 @@ function playerMove(delta) {
 				for (let i = 0; i < doors.length; i++) {
 					if (player.hasKey && checkCollision(player.nextX - player.w / 2, player.y, player.w, player.h, doors[i].x, doors[i].y, doors[i].w, doors[i].h)) {
 						//doors[i].sprite.texture = PIXI.loader.resources["images/Дверь_откр.png"].texture;
-						doors[i].sprite.texture = PIXI.Texture.fromFrame('door_open.png');
+						doors[i].sprite.texture = PIXI.loader.resources["images/door_open.png"].texture;
+						//doors[i].sprite.texture = PIXI.Texture.fromFrame('door_open.png');
 						tileMap[doors[i].bottomTileY][doors[i].bottomTileX] = 0;
 						tileMap[doors[i].bottomTileY - 1][doors[i].bottomTileX] = 0;
 						tileMap[doors[i].bottomTileY - 2][doors[i].bottomTileX] = 0;
 						player.hasKey = false;
 						//menuKey.texture = PIXI.loader.resources["images/Меню_Ключ_Нет.png"].texture;
-						menuKey.texture = PIXI.Texture.fromFrame('menu_key_false.png');
+						menuKey.texture = PIXI.loader.resources["images/menu_key_false.png"].texture;
+						//menuKey.texture = PIXI.Texture.fromFrame('menu_key_false.png');
 					}
 				}
 			}
@@ -496,13 +526,15 @@ function playerMove(delta) {
 				for (let i = 0; i < doors.length; i++) {
 					if (player.hasKey && checkCollision(player.nextX - player.w / 2, player.y, player.w, player.h, doors[i].x, doors[i].y, doors[i].w, doors[i].h)) {
 						//doors[i].sprite.texture = PIXI.loader.resources["images/Дверь_откр.png"].texture;
-						doors[i].sprite.texture = PIXI.Texture.fromFrame('door_open.png');
+						doors[i].sprite.texture = PIXI.loader.resources["images/door_open.png"].texture;
+						//doors[i].sprite.texture = PIXI.Texture.fromFrame('door_open.png');
 						tileMap[doors[i].bottomTileY][doors[i].bottomTileX] = 0;
 						tileMap[doors[i].bottomTileY - 1][doors[i].bottomTileX] = 0;
 						tileMap[doors[i].bottomTileY - 2][doors[i].bottomTileX] = 0;
 						player.hasKey = false;
 						//menuKey.texture = PIXI.loader.resources["images/Меню_Ключ_Нет.png"].texture;
-						menuKey.texture = PIXI.Texture.fromFrame('menu_key_false.png');
+						menuKey.texture = PIXI.loader.resources["images/menu_key_false.png"].texture;
+						//menuKey.texture = PIXI.Texture.fromFrame('menu_key_false.png');
 					}
 				}
 			} 
@@ -597,7 +629,8 @@ function playerMove(delta) {
 function bulletAdd() {
 	let bullet = {
 		//sprite: new PIXI.Sprite(PIXI.loader.resources["images/Пуля.png"].texture),
-		sprite: new PIXI.Sprite(PIXI.Texture.fromFrame('bullet.png')),
+		sprite: new PIXI.Sprite(PIXI.loader.resources["images/bullet.png"].texture),
+		//sprite: new PIXI.Sprite(PIXI.Texture.fromFrame('bullet.png')),
 		x: 0,
 		y: player.y + player.h / 1.5,
 		w: 8,
@@ -649,7 +682,8 @@ function bulletMove(delta) {
 		if (tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] == 5) {
 			tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] = 6;			
 			//tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.loader.resources["images/Кирпич_2.png"].texture;
-			tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.Texture.fromFrame('brick_2.png');
+			tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.loader.resources["images/brick_2.png"].texture;
+			//tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.Texture.fromFrame('brick_2.png');
 			bullets[i].sprite.parent.removeChild(bullets[i].sprite);
 			bullets.splice(i, 1);
 		} else
@@ -657,7 +691,8 @@ function bulletMove(delta) {
 		if (tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] == 6) {
 			tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] = 7;			
 			//tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.loader.resources["images/Кирпич_3.png"].texture;
-			tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.Texture.fromFrame('brick_3.png');
+			tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.loader.resources["images/brick_3.png"].texture;
+			//tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.Texture.fromFrame('brick_3.png');
 			bullets[i].sprite.parent.removeChild(bullets[i].sprite);
 			bullets.splice(i, 1);
 		} else
@@ -707,7 +742,8 @@ function bonusesUpdate() {
 				bonuses[i].sprite.visible = false;
 				player.hasKey = true;
 				//menuKey.texture = PIXI.loader.resources["images/Меню_Ключ_Да.png"].texture;
-				menuKey.texture = PIXI.Texture.fromFrame('menu_key_true.png');
+				menuKey.texture = PIXI.loader.resources["images/menu_key_true.png"].texture;
+				//menuKey.texture = PIXI.Texture.fromFrame('menu_key_true.png');
 			}
 			//music.play();
 		}
