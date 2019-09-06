@@ -20,6 +20,14 @@ PIXI.loader.add('images/door_open.png');
 PIXI.loader.add('images/menu_ammo.png');
 PIXI.loader.add('images/menu_key_true.png');
 PIXI.loader.add('images/menu_key_false.png');
+PIXI.loader.add('images/explosion_1.png');
+PIXI.loader.add('images/explosion_2.png');
+PIXI.loader.add('images/explosion_3.png');
+PIXI.loader.add('images/explosion_4.png');
+PIXI.loader.add('images/explosion_5.png');
+PIXI.loader.add('images/explosion_6.png');
+PIXI.loader.add('images/explosion_7.png');
+
 /*PIXI.loader.add('images/Бетон_1.png');
 PIXI.loader.add('images/Кирпич_1.png');
 PIXI.loader.add('images/Кирпич_2.png');
@@ -151,6 +159,9 @@ for (let i = 0; i < tileCountY; i++) {
 
 let bullets = [];
 
+let explosionTextures = [];
+let explosions = [];
+
 let menuAmmo;
 let menuAmmoCountText;
 let menuKey;
@@ -216,6 +227,12 @@ function setup() {
 		let fire = PIXI.loader.resources['images/fire_' + (i + 1) + '.png'].texture;
 		//let fire = PIXI.Texture.fromFrame('fire_' + (i + 1) + '.png');
 		fireTextures.push(fire);
+	}
+	
+	for (let i = 0; i < 7; i++) {
+		let explosion = PIXI.loader.resources['images/explosion_' + (i + 1) + '.png'].texture;
+		//let fire = PIXI.Texture.fromFrame('fire_' + (i + 1) + '.png');
+		explosionTextures.push(explosion);
 	}
 	
 	
@@ -367,7 +384,7 @@ function setup() {
 	
 	app.ticker.start();
 	
-	
+	//explosionAdd();
 	//music.play();
 }
 
@@ -612,6 +629,11 @@ function playerMove(delta) {
 		doors[i].sprite.x = doors[i].x - offsetX;
 		doors[i].sprite.y = doors[i].y - offsetY;
 	}
+	for (let i = 0; i < explosions.length; i++) {
+		explosions[i].sprite.x = explosions[i].x - offsetX;
+		explosions[i].sprite.y = explosions[i].y - offsetY;
+	}
+	
 	
 	if (player.directionLeft) {
 		player.sprite.scale.x = -0.75;
@@ -660,6 +682,30 @@ function bulletAdd() {
 }
 
 
+////////// СОЗДАНИЕ НОВОГО ВЗРЫВА /////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function explosionAdd(setX, setY) {
+	let explosion = {
+		sprite: new PIXI.extras.AnimatedSprite(explosionTextures),
+		x: setX,
+		y: setY
+	}
+	explosion.sprite.animationSpeed = 0.8;
+	explosion.sprite.loop = false;
+	explosion.sprite.onComplete = function() {
+		explosion.sprite.parent.removeChild(explosion.sprite);
+		explosions.splice(explosions.indexOf(explosion), 1);
+	};
+	explosion.sprite.anchor.x = 0.5;
+	explosion.sprite.anchor.y = 0.5;
+	explosion.sprite.x = explosion.x - offsetX;
+	explosion.sprite.y = explosion.y - offsetY;
+	explosion.sprite.play();
+	app.stage.addChild(explosion.sprite);
+	explosions.push(explosion);
+}
+
+
 ////////// ПЕРЕМЕЩЕНИЕ ПУЛИ ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 function bulletMove(delta) {
@@ -670,11 +716,21 @@ function bulletMove(delta) {
 		
 		//Попадание в бетон
 		if (tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] == 1) {
+			if (bullets[i].dX > 0) {
+				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize, bullets[i].y);
+			} else {
+				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize + tileSize, bullets[i].y);
+			}
 			bullets[i].sprite.parent.removeChild(bullets[i].sprite);
 			bullets.splice(i, 1);
 		} else 
 		//Попадание в дверь
 		if (tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] > 1 && tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] < 5) {
+			if (bullets[i].dX > 0) {
+				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize, bullets[i].y);
+			} else {
+				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize + tileSize, bullets[i].y);
+			}
 			bullets[i].sprite.parent.removeChild(bullets[i].sprite);
 			bullets.splice(i, 1);
 		} else 
@@ -684,6 +740,11 @@ function bulletMove(delta) {
 			//tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.loader.resources["images/Кирпич_2.png"].texture;
 			tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.loader.resources["images/brick_2.png"].texture;
 			//tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.Texture.fromFrame('brick_2.png');
+			if (bullets[i].dX > 0) {
+				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize, bullets[i].y);
+			} else {
+				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize + tileSize, bullets[i].y);
+			}
 			bullets[i].sprite.parent.removeChild(bullets[i].sprite);
 			bullets.splice(i, 1);
 		} else
@@ -693,6 +754,11 @@ function bulletMove(delta) {
 			//tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.loader.resources["images/Кирпич_3.png"].texture;
 			tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.loader.resources["images/brick_3.png"].texture;
 			//tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.Texture.fromFrame('brick_3.png');
+			if (bullets[i].dX > 0) {
+				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize, bullets[i].y);
+			} else {
+				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize + tileSize, bullets[i].y);
+			}
 			bullets[i].sprite.parent.removeChild(bullets[i].sprite);
 			bullets.splice(i, 1);
 		} else
@@ -700,6 +766,11 @@ function bulletMove(delta) {
 		if (tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] == 7) {
 			tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] = 0;			
 			tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].parent.removeChild(tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)]);
+			if (bullets[i].dX > 0) {
+				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize, bullets[i].y);
+			} else {
+				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize + tileSize, bullets[i].y);
+			}
 			bullets[i].sprite.parent.removeChild(bullets[i].sprite);
 			bullets.splice(i, 1);
 		} else
