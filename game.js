@@ -11,7 +11,7 @@ PIXI.loader.add('images/fire_1.png');
 PIXI.loader.add('images/fire_2.png');
 PIXI.loader.add('images/fire_3.png');
 PIXI.loader.add('images/fire_4.png');
-PIXI.loader.add('images/player.png');
+//PIXI.loader.add('images/player.png');
 PIXI.loader.add('images/bullet.png');
 PIXI.loader.add('images/bonus_ammo.png');
 PIXI.loader.add('images/bonus_key.png');
@@ -27,26 +27,11 @@ PIXI.loader.add('images/explosion_4.png');
 PIXI.loader.add('images/explosion_5.png');
 PIXI.loader.add('images/explosion_6.png');
 PIXI.loader.add('images/explosion_7.png');
+PIXI.loader.add('images/player_run_1.png');
+PIXI.loader.add('images/player_run_2.png');
+PIXI.loader.add('images/player_run_3.png');
+PIXI.loader.add('images/player_run_4.png');
 
-/*PIXI.loader.add('images/Бетон_1.png');
-PIXI.loader.add('images/Кирпич_1.png');
-PIXI.loader.add('images/Кирпич_2.png');
-PIXI.loader.add('images/Кирпич_3.png');
-PIXI.loader.add('images/Панель_1.png');
-PIXI.loader.add('images/Огонь.png');
-PIXI.loader.add('images/Огонь_1.png');
-PIXI.loader.add('images/Огонь_2.png');
-PIXI.loader.add('images/Огонь_3.png');
-PIXI.loader.add('images/Огонь_4.png');
-PIXI.loader.add('images/Персонаж_3.png');
-PIXI.loader.add('images/Пуля.png');
-PIXI.loader.add('images/БонусПатроны.png');
-PIXI.loader.add('images/БонусКлюч.png');
-PIXI.loader.add('images/Дверь_закр.png');
-PIXI.loader.add('images/Дверь_откр.png');
-PIXI.loader.add('images/Меню_Патроны.png');
-PIXI.loader.add('images/Меню_Ключ_Да.png');
-PIXI.loader.add('images/Меню_Ключ_Нет.png');*/
 PIXI.loader.load(setup);
 
 document.addEventListener("keydown", keyDownHandler, false);
@@ -172,22 +157,16 @@ let doors = [];
 
 let fireTextures = [];
 
+let playerRunTextures = [];
 
 let textStyle1 = new PIXI.TextStyle({
 	fontFamily: 'Tahoma',
 	fontSize: 20,
 	fontWeight: 'bolder',
 	align: 'center',
-	fill: ['#FFA040'],
+	fill: ['#FFFF88'],
 	stroke: '#404040',
-	strokeThickness: 3,
-	//dropShadow: true,
-	//dropShadowColor: '#835D68',
-	//dropShadowBlur: 2,
-	//dropShadowAngle: Math.PI * 1.5,
-	//dropShadowDistance: 3,
-	//lineJoin: 'round',
-	//lineHeight: 31
+	strokeThickness: 4,
 });
 
 
@@ -235,6 +214,10 @@ function setup() {
 		explosionTextures.push(explosion);
 	}
 	
+	for (let i = 0; i < 4; i++) {
+		let playerRun = PIXI.loader.resources['images/player_run_' + (i + 1) + '.png'].texture;
+		playerRunTextures.push(playerRun);
+	}
 	
 	// ЗАГРУЗКА КАРТЫ ТАЙЛОВ
 	for (let i = 0; i < tileCountY; i++) {
@@ -350,8 +333,10 @@ function setup() {
 	// ЗАГРУЗКА ИГРОКА
 	//const WIN_gift_mouseB = PIXI.Texture.fromFrame('WIN_gift_mouseB.png');
 	//player.sprite = new PIXI.Sprite(PIXI.loader.resources["images/Персонаж_3.png"].texture);
-	player.sprite = new PIXI.Sprite(PIXI.loader.resources["images/player.png"].texture);
+	//player.sprite = new PIXI.Sprite(PIXI.loader.resources["images/player.png"].texture);
 	//player.sprite = new PIXI.Sprite(PIXI.Texture.fromFrame('player.png'));
+	player.sprite = new PIXI.extras.AnimatedSprite(playerRunTextures);
+	player.sprite.animationSpeed = 0.3;
 	player.sprite.anchor.x = 0.5;
 	player.sprite.x = player.x;
 	player.sprite.y = player.y;
@@ -415,16 +400,23 @@ function keyDownHandler(e) {
 		player.moveRight = true;
 		player.moveLeft = false;
 		player.directionLeft = false;
+		if (player.onGround) {
+			//player.sprite.play();
+		}
 	}
 	else if (e.keyCode == 37) {
 		player.moveLeft = true;
 		player.moveRight = false;
 		player.directionLeft = true;
+		if (player.onGround) {
+			//player.sprite.play();
+		}
 	}
 	if (e.keyCode == 38) {
 		if (player.onGround) {
 			player.jump = true;
 			player.onGround = false;
+			player.sprite.stop();
 		}
 	}
 	if (e.keyCode == 32 && player.ammoCount > 0 && player.canShoot) {
@@ -440,10 +432,12 @@ function keyUpHandler(e) {
 	if(e.keyCode == 39) {
 		player.moveRight = false;
 		//player.moveLeft = false;
+		//player.sprite.gotoAndStop(0);
 	}
 	else if(e.keyCode == 37) {
 		player.moveLeft = false;
 		//player.moveRight = false;
+		//player.sprite.gotoAndStop(0);
 	}
 	if (e.keyCode == 32 && !player.canShoot) {
 		player.canShoot = true;
@@ -465,10 +459,13 @@ function gameUpdate(delta){
 function playerMove(delta) {
 	if (player.moveLeft) {
 		player.dX = -5
+		player.sprite.play();
 	} else if (player.moveRight) {
 		player.dX = 5;
+		player.sprite.play();
 	} else {
 		player.dX = 0;
+		player.sprite.gotoAndStop(0);
 	}
 	
 	player.nextX = player.x + player.dX * delta;
@@ -482,6 +479,7 @@ function playerMove(delta) {
 	}
 	if (!col) {
 		player.onGround = false;
+		//player.sprite.gotoAndStop(0);
 	}
 	
 	if (player.jump) {
@@ -615,10 +613,10 @@ function playerMove(delta) {
 	player.y = player.nextY;
 	
 	if ((player.x > app.screen.width / 2 - player.w / 2) && (player.x < tiles.width - app.screen.width / 2 - player.w / 2)) {
-		offsetX = player.x - app.screen.width / 2 + player.w / 2;
+		offsetX = Math.floor(player.x - app.screen.width / 2 + player.w / 2);
 	}
 	if ((player.y > app.screen.height / 2 - player.h / 2) && (player.y < tiles.height - app.screen.height / 2 - player.h / 2)) {
-		offsetY = player.y - app.screen.height / 2 + player.h / 2;
+		offsetY = Math.floor(player.y - app.screen.height / 2 + player.h / 2);
 	}
 	
 	tiles.x = -offsetX;
@@ -636,9 +634,9 @@ function playerMove(delta) {
 	
 	
 	if (player.directionLeft) {
-		player.sprite.scale.x = -0.75;
+		player.sprite.scale.x = -1;
 	} else {
-		player.sprite.scale.x = 0.75;
+		player.sprite.scale.x = 1;
 	}
 	
 	player.sprite.x = player.x - offsetX;
@@ -716,21 +714,23 @@ function bulletMove(delta) {
 		
 		//Попадание в бетон
 		if (tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] == 1) {
-			if (bullets[i].dX > 0) {
+			/*if (bullets[i].dX > 0) {
 				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize, bullets[i].y);
 			} else {
 				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize + tileSize, bullets[i].y);
-			}
+			}*/
+			explosionAdd(bullets[i].x, bullets[i].y);
 			bullets[i].sprite.parent.removeChild(bullets[i].sprite);
 			bullets.splice(i, 1);
 		} else 
 		//Попадание в дверь
 		if (tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] > 1 && tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] < 5) {
-			if (bullets[i].dX > 0) {
+			/*if (bullets[i].dX > 0) {
 				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize, bullets[i].y);
 			} else {
 				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize + tileSize, bullets[i].y);
-			}
+			}*/
+			explosionAdd(bullets[i].x, bullets[i].y);
 			bullets[i].sprite.parent.removeChild(bullets[i].sprite);
 			bullets.splice(i, 1);
 		} else 
@@ -740,11 +740,12 @@ function bulletMove(delta) {
 			//tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.loader.resources["images/Кирпич_2.png"].texture;
 			tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.loader.resources["images/brick_2.png"].texture;
 			//tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.Texture.fromFrame('brick_2.png');
-			if (bullets[i].dX > 0) {
+			/*if (bullets[i].dX > 0) {
 				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize, bullets[i].y);
 			} else {
 				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize + tileSize, bullets[i].y);
-			}
+			}*/
+			explosionAdd(bullets[i].x, bullets[i].y);
 			bullets[i].sprite.parent.removeChild(bullets[i].sprite);
 			bullets.splice(i, 1);
 		} else
@@ -754,11 +755,12 @@ function bulletMove(delta) {
 			//tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.loader.resources["images/Кирпич_3.png"].texture;
 			tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.loader.resources["images/brick_3.png"].texture;
 			//tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.Texture.fromFrame('brick_3.png');
-			if (bullets[i].dX > 0) {
+			/*if (bullets[i].dX > 0) {
 				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize, bullets[i].y);
 			} else {
 				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize + tileSize, bullets[i].y);
-			}
+			}*/
+			explosionAdd(bullets[i].x, bullets[i].y);
 			bullets[i].sprite.parent.removeChild(bullets[i].sprite);
 			bullets.splice(i, 1);
 		} else
@@ -766,11 +768,12 @@ function bulletMove(delta) {
 		if (tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] == 7) {
 			tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] = 0;			
 			tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].parent.removeChild(tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)]);
-			if (bullets[i].dX > 0) {
+			/*if (bullets[i].dX > 0) {
 				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize, bullets[i].y);
 			} else {
 				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize + tileSize, bullets[i].y);
-			}
+			}*/
+			explosionAdd(bullets[i].x, bullets[i].y);
 			bullets[i].sprite.parent.removeChild(bullets[i].sprite);
 			bullets.splice(i, 1);
 		} else
