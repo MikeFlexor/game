@@ -853,10 +853,11 @@ function gameOver(delta) {
 	for (let i = 0; i < explosions.length; i++) {
 		explosions[i].sprite.stop();
 	}
-	gameOverCount++;
-	if (gameOverCount < 31) {
+	
+	if (gameOverCount < 30) {
+		gameOverCount++;
 		gameOverText.visible = true;
-		gameOverText.y = gameOverCount - gameOverText.height;
+		gameOverText.y = gameOverCount * 3 - gameOverText.height;
 		moveRect_1 = Math.round(player.sprite.y * gameOverCount / 30);
 		moveRect_2 = Math.round((app.screen.width - player.sprite.x - player.sprite.width / 2) * gameOverCount / 30);
 		moveRect_3 = Math.round((app.screen.height - player.sprite.y - player.sprite.height) * gameOverCount / 30);
@@ -866,7 +867,5 @@ function gameOver(delta) {
 		gameOverRect.drawRect(app.screen.width - moveRect_2, moveRect_1, moveRect_2, app.screen.height - moveRect_3 - moveRect_1);
 		gameOverRect.drawRect(0, app.screen.height - moveRect_3, app.screen.width, moveRect_3);
 		gameOverRect.drawRect(0, moveRect_1, moveRect_4, app.screen.height - moveRect_3 - moveRect_1);
-	} else if (gameOverCount < 100) {
-		gameOverText.y = gameOverCount - gameOverText.height;
 	}
 }
