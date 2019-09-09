@@ -1,4 +1,4 @@
-const app = new PIXI.Application(800, 600, { transparent: true });
+const app = new PIXI.Application(800, 600);
 document.body.appendChild(app.view);
 
 //PIXI.loader.add('atlas', 'https://raw.githubusercontent.com/MikeFlexor/game/master/atlas/atlas.json');
@@ -11,7 +11,6 @@ PIXI.loader.add('images/fire_1.png');
 PIXI.loader.add('images/fire_2.png');
 PIXI.loader.add('images/fire_3.png');
 PIXI.loader.add('images/fire_4.png');
-//PIXI.loader.add('images/player.png');
 PIXI.loader.add('images/bullet.png');
 PIXI.loader.add('images/bonus_ammo.png');
 PIXI.loader.add('images/bonus_key.png');
@@ -41,7 +40,6 @@ document.addEventListener("keyup", keyUpHandler, false);
 //music.autoplay = true;
 
 
-
 app.ticker.add(delta => gameUpdate(delta));
 app.ticker.stop();
 
@@ -62,7 +60,8 @@ let player = {
 	directionLeft: false,
 	ammoCount: 0,
 	canShoot: true,
-	hasKey: false
+	hasKey: false,
+	alive: true
 }
 
 let offsetX = 0;
@@ -169,6 +168,21 @@ let textStyle1 = new PIXI.TextStyle({
 	strokeThickness: 4,
 });
 
+let textStyle2 = new PIXI.TextStyle({
+	fontFamily: 'Tahoma',
+	fontSize: 50,
+	fontWeight: 'bolder',
+	align: 'center',
+	fill: ['#FFFFFF'],
+	stroke: '#CC0000',
+	strokeThickness: 10,
+});
+
+let gameOverCount = 0;
+let gameOverRect = new PIXI.Graphics();
+
+let gameOverText;
+
 
 ////////// НАЧАЛЬНЫЕ УСТАНОВКИ /////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -196,13 +210,12 @@ function setup() {
 	player.ammoCount = 0;
 	player.canShoot = true;
 	player.hasKey = false;
+	player.alive = true;
 	
 	offsetX = 0;
 	offsetY = 0;
 	
-	
 	for (let i = 0; i < 4; i++) {
-		//let fire = PIXI.loader.resources['images/Огонь_' + (i + 1) + '.png'].texture;
 		let fire = PIXI.loader.resources['images/fire_' + (i + 1) + '.png'].texture;
 		//let fire = PIXI.Texture.fromFrame('fire_' + (i + 1) + '.png');
 		fireTextures.push(fire);
@@ -228,7 +241,6 @@ function setup() {
 				tile = new PIXI.Sprite();
 			}
 			if (tileMap[i][j] == 1) {
-				//tile = new PIXI.Sprite(PIXI.loader.resources["images/Бетон_1.png"].texture);
 				tile = new PIXI.Sprite(PIXI.loader.resources["images/wall.png"].texture);
 				//tile = new PIXI.Sprite(PIXI.Texture.fromFrame('wall.png'));
 			}
@@ -250,7 +262,6 @@ function setup() {
 				door.bottomTileY = i;
 				door.x = j * tileSize;
 				door.y = (i - 2) * tileSize;
-				//door.sprite = new PIXI.Sprite(PIXI.loader.resources["images/Дверь_закр.png"].texture);
 				door.sprite = new PIXI.Sprite(PIXI.loader.resources["images/door_close.png"].texture);
 				//door.sprite = new PIXI.Sprite(PIXI.Texture.fromFrame('door_close.png'));
 				door.sprite.x = door.x;
@@ -274,11 +285,9 @@ function setup() {
 				bonus.y = i * tileSize;
 				bonus.sway = Math.random() * 61;
 				if (bonus.type == 1) {
-					//bonus.sprite = new PIXI.Sprite(PIXI.loader.resources["images/БонусПатроны.png"].texture);
 					bonus.sprite = new PIXI.Sprite(PIXI.loader.resources["images/bonus_ammo.png"].texture);
 					//bonus.sprite = new PIXI.Sprite(PIXI.Texture.fromFrame('bonus_ammo.png'));
 				} else if (bonus.type == 2) {
-					//bonus.sprite = new PIXI.Sprite(PIXI.loader.resources["images/БонусКлюч.png"].texture);
 					bonus.sprite = new PIXI.Sprite(PIXI.loader.resources["images/bonus_key.png"].texture);
 					//bonus.sprite = new PIXI.Sprite(PIXI.Texture.fromFrame('bonus_key.png'));
 				}
@@ -288,7 +297,6 @@ function setup() {
 				tileMap[i][j] = 0;
 			}
 			if (tileMap[i][j] == 5) {
-				//tile = new PIXI.Sprite(PIXI.loader.resources["images/Кирпич_1.png"].texture);
 				tile = new PIXI.Sprite(PIXI.loader.resources["images/brick_1.png"].texture);
 				//tile = new PIXI.Sprite(PIXI.Texture.fromFrame('brick_1.png'));
 			}
@@ -311,7 +319,6 @@ function setup() {
 	
 	// ЗАГРУЗКА ТАЙЛОВОГО ФОНА
 	tilingSprite = new PIXI.extras.TilingSprite(
-		//PIXI.loader.resources["images/Панель_1.png"].texture,
 		PIXI.loader.resources["images/back.png"].texture,
 		//PIXI.Texture.fromFrame('back.png'),
 		tiles.width,
@@ -331,10 +338,6 @@ function setup() {
 
 	
 	// ЗАГРУЗКА ИГРОКА
-	//const WIN_gift_mouseB = PIXI.Texture.fromFrame('WIN_gift_mouseB.png');
-	//player.sprite = new PIXI.Sprite(PIXI.loader.resources["images/Персонаж_3.png"].texture);
-	//player.sprite = new PIXI.Sprite(PIXI.loader.resources["images/player.png"].texture);
-	//player.sprite = new PIXI.Sprite(PIXI.Texture.fromFrame('player.png'));
 	player.sprite = new PIXI.extras.AnimatedSprite(playerRunTextures);
 	player.sprite.animationSpeed = 0.3;
 	player.sprite.anchor.x = 0.5;
@@ -344,15 +347,12 @@ function setup() {
 	player.sprite.height = 48;
 	app.stage.addChild(player.sprite);
 	
-	
-	//menuAmmo = new PIXI.Sprite(PIXI.loader.resources["images/Меню_Патроны.png"].texture);
 	menuAmmo = new PIXI.Sprite(PIXI.loader.resources["images/menu_ammo.png"].texture);
 	//menuAmmo = new PIXI.Sprite(PIXI.Texture.fromFrame('menu_ammo.png'));
 	menuAmmo.x = 10;
 	menuAmmo.y = 10;
 	app.stage.addChild(menuAmmo);
 	
-	//menuKey = new PIXI.Sprite(PIXI.loader.resources["images/Меню_Ключ_Нет.png"].texture);
 	menuKey = new PIXI.Sprite(PIXI.loader.resources["images/menu_key_false.png"].texture);
 	//menuKey = new PIXI.Sprite(PIXI.Texture.fromFrame('menu_key_false.png'));
 	menuKey.x = 84;
@@ -365,15 +365,22 @@ function setup() {
 	menuAmmoCountText.y = 10;
 	app.stage.addChild(menuAmmoCountText);
 	
+	gameOverCount = 0;
+	gameOverRect.beginFill(0x000000, 0.8);
+	app.stage.addChild(gameOverRect);
+	gameOverRect.clear();
 	
+	gameOverText = new PIXI.Text('Игра окончена!', textStyle2);
+	gameOverText.x = (app.screen.width - gameOverText.width) / 2;
+	gameOverText.visible = false;
+	app.stage.addChild(gameOverText);
 	
 	app.ticker.start();
-	
-	//explosionAdd();
-	//music.play();
 }
 
 
+////////// РЕСТАРТ УРОВНЯ //////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
 function restart() {
 	app.ticker.stop();
 	for (let i = app.stage.children.length - 1; i >= 0; i--) {
@@ -386,9 +393,6 @@ function restart() {
 	bonuses = [];
 	doors = [];
 	
-	player.x = 100;
-	player.y = 100;
-	
 	setup();
 }
 
@@ -400,17 +404,11 @@ function keyDownHandler(e) {
 		player.moveRight = true;
 		player.moveLeft = false;
 		player.directionLeft = false;
-		if (player.onGround) {
-			//player.sprite.play();
-		}
 	}
 	else if (e.keyCode == 37) {
 		player.moveLeft = true;
 		player.moveRight = false;
 		player.directionLeft = true;
-		if (player.onGround) {
-			//player.sprite.play();
-		}
 	}
 	if (e.keyCode == 38) {
 		if (player.onGround) {
@@ -423,6 +421,9 @@ function keyDownHandler(e) {
 		bulletAdd();
 		player.canShoot = false;
 	}
+	if (!player.alive) {
+		restart();
+	}
 }
 
 
@@ -431,13 +432,9 @@ function keyDownHandler(e) {
 function keyUpHandler(e) {
 	if(e.keyCode == 39) {
 		player.moveRight = false;
-		//player.moveLeft = false;
-		//player.sprite.gotoAndStop(0);
 	}
 	else if(e.keyCode == 37) {
 		player.moveLeft = false;
-		//player.moveRight = false;
-		//player.sprite.gotoAndStop(0);
 	}
 	if (e.keyCode == 32 && !player.canShoot) {
 		player.canShoot = true;
@@ -449,20 +446,35 @@ function keyUpHandler(e) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 function gameUpdate(delta){
 	playerMove(delta);
-	bulletMove(delta);
-	bonusesUpdate();
+	if (player.alive) {
+		bulletMove(delta);
+		bonusesUpdate();
+	}
 }
 
 
 ////////// ПЕРЕМЕЩЕНИЕ ИГРОКА //////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 function playerMove(delta) {
+	if (!player.alive) {
+		gameOver(delta);
+		return;
+	}
+	
 	if (player.moveLeft) {
 		player.dX = -5
-		player.sprite.play();
+		if (player.onGround) {
+			player.sprite.play();
+		} else {
+			player.sprite.gotoAndStop(0);
+		}
 	} else if (player.moveRight) {
 		player.dX = 5;
-		player.sprite.play();
+		if (player.onGround) {
+			player.sprite.play();
+		} else {
+			player.sprite.gotoAndStop(0);
+		}
 	} else {
 		player.dX = 0;
 		player.sprite.gotoAndStop(0);
@@ -479,7 +491,6 @@ function playerMove(delta) {
 	}
 	if (!col) {
 		player.onGround = false;
-		//player.sprite.gotoAndStop(0);
 	}
 	
 	if (player.jump) {
@@ -506,22 +517,20 @@ function playerMove(delta) {
 			if (tileMap[i][Math.floor((player.nextX - player.w / 2) / tileSize)] == 2) {
 				for (let i = 0; i < doors.length; i++) {
 					if (player.hasKey && checkCollision(player.nextX - player.w / 2, player.y, player.w, player.h, doors[i].x, doors[i].y, doors[i].w, doors[i].h)) {
-						//doors[i].sprite.texture = PIXI.loader.resources["images/Дверь_откр.png"].texture;
 						doors[i].sprite.texture = PIXI.loader.resources["images/door_open.png"].texture;
 						//doors[i].sprite.texture = PIXI.Texture.fromFrame('door_open.png');
 						tileMap[doors[i].bottomTileY][doors[i].bottomTileX] = 0;
 						tileMap[doors[i].bottomTileY - 1][doors[i].bottomTileX] = 0;
 						tileMap[doors[i].bottomTileY - 2][doors[i].bottomTileX] = 0;
 						player.hasKey = false;
-						//menuKey.texture = PIXI.loader.resources["images/Меню_Ключ_Нет.png"].texture;
 						menuKey.texture = PIXI.loader.resources["images/menu_key_false.png"].texture;
 						//menuKey.texture = PIXI.Texture.fromFrame('menu_key_false.png');
 					}
 				}
 			}
 			if (tileMap[i][Math.floor((player.nextX - player.w / 2) / tileSize)] == 8) {
-				restart();
-				//console.log('death');
+				player.alive = false;
+				//restart();
 			}
 			if (tileMap[i][Math.floor((player.nextX - player.w / 2) / tileSize)] == 9) {
 				alert('Вы выиграли!');
@@ -540,22 +549,20 @@ function playerMove(delta) {
 			if (tileMap[i][Math.floor((player.nextX + player.w / 2) / tileSize)] == 2) {
 				for (let i = 0; i < doors.length; i++) {
 					if (player.hasKey && checkCollision(player.nextX - player.w / 2, player.y, player.w, player.h, doors[i].x, doors[i].y, doors[i].w, doors[i].h)) {
-						//doors[i].sprite.texture = PIXI.loader.resources["images/Дверь_откр.png"].texture;
 						doors[i].sprite.texture = PIXI.loader.resources["images/door_open.png"].texture;
 						//doors[i].sprite.texture = PIXI.Texture.fromFrame('door_open.png');
 						tileMap[doors[i].bottomTileY][doors[i].bottomTileX] = 0;
 						tileMap[doors[i].bottomTileY - 1][doors[i].bottomTileX] = 0;
 						tileMap[doors[i].bottomTileY - 2][doors[i].bottomTileX] = 0;
 						player.hasKey = false;
-						//menuKey.texture = PIXI.loader.resources["images/Меню_Ключ_Нет.png"].texture;
 						menuKey.texture = PIXI.loader.resources["images/menu_key_false.png"].texture;
 						//menuKey.texture = PIXI.Texture.fromFrame('menu_key_false.png');
 					}
 				}
 			} 
 			if (tileMap[i][Math.floor((player.nextX + player.w / 2) / tileSize)] == 8) {
-				restart();
-				//console.log('death');
+				player.alive = false;
+				//restart();
 			}
 			if (tileMap[i][Math.floor((player.nextX + player.w / 2) / tileSize)] == 9) {
 				alert('Вы выиграли!');
@@ -576,8 +583,8 @@ function playerMove(delta) {
 				col = true;
 			}
 			if (tileMap[Math.floor(player.nextY / tileSize)][j] == 8) {
-				restart();
-				//console.log('death');
+				player.alive = false;
+				//restart();
 			}
 			if (tileMap[Math.floor(player.nextY / tileSize)][j] == 9) {
 				alert('Вы выиграли!');
@@ -595,8 +602,8 @@ function playerMove(delta) {
 				col = true;
 			}
 			if (tileMap[Math.floor((player.nextY + player.h) / tileSize)][j] == 8) {
-				restart();
-				//console.log('death');
+				player.alive = false;
+				//restart();
 			}
 			if (tileMap[Math.floor((player.nextY + player.h) / tileSize)][j] == 9) {
 				alert('Вы выиграли!');
@@ -628,10 +635,9 @@ function playerMove(delta) {
 		doors[i].sprite.y = doors[i].y - offsetY;
 	}
 	for (let i = 0; i < explosions.length; i++) {
-		explosions[i].sprite.x = explosions[i].x - offsetX;
-		explosions[i].sprite.y = explosions[i].y - offsetY;
-	}
-	
+		explosions[i].sprite.x = explosions[i].x;
+		explosions[i].sprite.y = explosions[i].y;
+	}	
 	
 	if (player.directionLeft) {
 		player.sprite.scale.x = -1;
@@ -648,7 +654,6 @@ function playerMove(delta) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 function bulletAdd() {
 	let bullet = {
-		//sprite: new PIXI.Sprite(PIXI.loader.resources["images/Пуля.png"].texture),
 		sprite: new PIXI.Sprite(PIXI.loader.resources["images/bullet.png"].texture),
 		//sprite: new PIXI.Sprite(PIXI.Texture.fromFrame('bullet.png')),
 		x: 0,
@@ -672,7 +677,7 @@ function bulletAdd() {
 	} else {
 		bullet.dX = 10;
 	}
-	app.stage.addChild(bullet.sprite);
+	tiles.addChild(bullet.sprite);
 	bullets.push(bullet);
 	player.ammoCount--;
 	menuAmmoCountText.text = player.ammoCount;
@@ -696,10 +701,10 @@ function explosionAdd(setX, setY) {
 	};
 	explosion.sprite.anchor.x = 0.5;
 	explosion.sprite.anchor.y = 0.5;
-	explosion.sprite.x = explosion.x - offsetX;
-	explosion.sprite.y = explosion.y - offsetY;
+	explosion.sprite.x = explosion.x;
+	explosion.sprite.y = explosion.y;
 	explosion.sprite.play();
-	app.stage.addChild(explosion.sprite);
+	tiles.addChild(explosion.sprite);
 	explosions.push(explosion);
 }
 
@@ -709,8 +714,8 @@ function explosionAdd(setX, setY) {
 function bulletMove(delta) {
 	for (let i = 0; i < bullets.length; i++) {
 		bullets[i].x += bullets[i].dX * delta;
-		bullets[i].sprite.x = bullets[i].x - offsetX;
-		bullets[i].sprite.y = bullets[i].y - offsetY;
+		bullets[i].sprite.x = bullets[i].x;
+		bullets[i].sprite.y = bullets[i].y;
 		
 		//Попадание в бетон
 		if (tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] == 1) {
@@ -815,11 +820,9 @@ function bonusesUpdate() {
 				bonuses[i].cooldown = -1;
 				bonuses[i].sprite.visible = false;
 				player.hasKey = true;
-				//menuKey.texture = PIXI.loader.resources["images/Меню_Ключ_Да.png"].texture;
 				menuKey.texture = PIXI.loader.resources["images/menu_key_true.png"].texture;
 				//menuKey.texture = PIXI.Texture.fromFrame('menu_key_true.png');
 			}
-			//music.play();
 		}
 	}
 }
@@ -829,4 +832,41 @@ function bonusesUpdate() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 function checkCollision(x1, y1, w1, h1, x2, y2, w2, h2) {
 	return ((x1 + w1) > x2) && (x1 < (x2 + w2)) && ((y1 + h1) > y2) && (y1 < (y2 + h2));
+}
+
+
+////////// ДЕЙСТВИЯ ПРИ СМЕРТИ ИГРОКА //////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function gameOver(delta) {
+	let moveRect_1;
+	let moveRect_2;
+	let moveRect_3;
+	let moveRect_4;
+	player.sprite.stop();
+	for (let i = 0; i < tileCountY; i++) {
+		for (let j = 0; j < tileCountX; j++) {
+			if (tileMap[i][j] == 8) {
+				tilesSprites[i][j].stop();
+			}
+		}
+	}
+	for (let i = 0; i < explosions.length; i++) {
+		explosions[i].sprite.stop();
+	}
+	gameOverCount++;
+	if (gameOverCount < 31) {
+		gameOverText.visible = true;
+		gameOverText.y = gameOverCount - gameOverText.height;
+		moveRect_1 = Math.round(player.sprite.y * gameOverCount / 30);
+		moveRect_2 = Math.round((app.screen.width - player.sprite.x - player.sprite.width / 2) * gameOverCount / 30);
+		moveRect_3 = Math.round((app.screen.height - player.sprite.y - player.sprite.height) * gameOverCount / 30);
+		moveRect_4 = Math.round((player.sprite.x - player.sprite.width / 2) * gameOverCount / 30);
+		gameOverRect.clear();
+		gameOverRect.drawRect(0, 0, app.screen.width, moveRect_1);
+		gameOverRect.drawRect(app.screen.width - moveRect_2, moveRect_1, moveRect_2, app.screen.height - moveRect_3 - moveRect_1);
+		gameOverRect.drawRect(0, app.screen.height - moveRect_3, app.screen.width, moveRect_3);
+		gameOverRect.drawRect(0, moveRect_1, moveRect_4, app.screen.height - moveRect_3 - moveRect_1);
+	} else if (gameOverCount < 100) {
+		gameOverText.y = gameOverCount - gameOverText.height;
+	}
 }
