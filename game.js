@@ -366,7 +366,7 @@ function setup() {
 	app.stage.addChild(menuAmmoCountText);
 	
 	gameOverCount = 0;
-	gameOverRect.beginFill(0x000000, 0.8);
+	//gameOverRect.beginFill(0x000000, 0.8);
 	app.stage.addChild(gameOverRect);
 	gameOverRect.clear();
 	
@@ -494,7 +494,7 @@ function playerMove(delta) {
 	}
 	
 	if (player.jump) {
-		player.dY = -10;
+		player.dY = -9.8;
 		player.jump = false;
 	}
 	
@@ -507,6 +507,7 @@ function playerMove(delta) {
 	}
 	
 	player.nextY = player.y + player.dY * delta;
+	console.log(player.dY * delta);
 	
 	if (player.dX < 0) {
 		let col = false;
@@ -863,9 +864,11 @@ function gameOver(delta) {
 		moveRect_3 = Math.round((app.screen.height - player.sprite.y - player.sprite.height) * gameOverCount / 30);
 		moveRect_4 = Math.round((player.sprite.x - player.sprite.width / 2) * gameOverCount / 30);
 		gameOverRect.clear();
+		gameOverRect.beginFill(0x000000, 0.8);
 		gameOverRect.drawRect(0, 0, app.screen.width, moveRect_1);
 		gameOverRect.drawRect(app.screen.width - moveRect_2, moveRect_1, moveRect_2, app.screen.height - moveRect_3 - moveRect_1);
 		gameOverRect.drawRect(0, app.screen.height - moveRect_3, app.screen.width, moveRect_3);
 		gameOverRect.drawRect(0, moveRect_1, moveRect_4, app.screen.height - moveRect_3 - moveRect_1);
+		gameOverRect.endFill();
 	}
 }
