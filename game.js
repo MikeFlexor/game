@@ -484,15 +484,14 @@ function playerMove(delta) {
 		
 	let col = false;
 	for (let j = Math.floor((player.x - player.w / 2) / tileSize); j <= Math.floor((player.x + player.w / 2) / tileSize); j++) {
-		if ((tileMap[Math.floor((player.y + player.h) / tileSize) + 1][j] != 0) &&
-			(player.y + player.h == Math.floor((player.y + player.h) / tileSize))) {
+		if ((tileMap[Math.floor((player.y + player.h) / tileSize) + 1][j] != 0)) {
 			col = true;
 		}
 	}
 	if (!col) {
 		player.onGround = false;
 	}
-	
+				
 	if (player.jump) {
 		player.dY = -9.8;
 		player.jump = false;
@@ -507,7 +506,6 @@ function playerMove(delta) {
 	}
 	
 	player.nextY = player.y + player.dY * delta;
-	console.log(player.dY * delta);
 	
 	if (player.dX < 0) {
 		let col = false;
