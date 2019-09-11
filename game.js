@@ -166,6 +166,7 @@ let textStyle1 = new PIXI.TextStyle({
 	fill: ['#FFFF88'],
 	stroke: '#404040',
 	strokeThickness: 4,
+	lineJoin: 'round'
 });
 
 let textStyle2 = new PIXI.TextStyle({
@@ -176,6 +177,7 @@ let textStyle2 = new PIXI.TextStyle({
 	fill: ['#FFFFFF'],
 	stroke: '#CC0000',
 	strokeThickness: 10,
+	lineJoin: 'round'
 });
 
 let gameOverCount = 0;
@@ -366,7 +368,6 @@ function setup() {
 	app.stage.addChild(menuAmmoCountText);
 	
 	gameOverCount = 0;
-	//gameOverRect.beginFill(0x000000, 0.8);
 	app.stage.addChild(gameOverRect);
 	gameOverRect.clear();
 	
@@ -448,7 +449,7 @@ function gameUpdate(delta){
 	playerMove(delta);
 	if (player.alive) {
 		bulletMove(delta);
-		bonusesUpdate();
+		bonusesUpdate(delta);
 	}
 }
 
@@ -792,31 +793,34 @@ function bulletMove(delta) {
 
 ////////// ОБРАБОТКА БОНУСОВ ///////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-function bonusesUpdate() {
+function bonusesUpdate(delta) {
 	for (let i = 0; i < bonuses.length; i++) {
-		if (bonuses[i].sway < 62) {
-			bonuses[i].sway++;
+		/*if (bonuses[i].sway < 62) {
+			bonuses[i].sway += delta;
 		} else {
 			bonuses[i].sway = 0;
-		}
-		bonuses[i].dY = Math.sin(bonuses[i].sway / 10);
+		}*/
+		bonuses[i].sway += delta;
+		bonuses[i].dY = Math.sin(bonuses[i].sway / 30);
 		bonuses[i].sprite.x = bonuses[i].x - offsetX;
-		bonuses[i].sprite.y = bonuses[i].y + bonuses[i].dY * 10 - offsetY;
-		if (bonuses[i].cooldown > 0) {
-			bonuses[i].cooldown--;
-		} else if (bonuses[i].cooldown == 0) {
+		bonuses[i].sprite.y = bonuses[i].y + bonuses[i].dY * 15 - offsetY;
+		if (bonuses[i].cooldown > 1000) {
+		} else if (bonuses[i].cooldown > 0) {
+			bonuses[i].cooldown -= delta;
+		} else if (bonuses[i].cooldown < 0) {
+			bonuses[i].cooldown = 0;
 			bonuses[i].sprite.visible = true;
 		}
 		if (bonuses[i].cooldown == 0 && checkCollision(player.x - player.w / 2, player.y, player.w, player.h, bonuses[i].x, bonuses[i].y, bonuses[i].w, bonuses[i].h)) {
 			if (bonuses[i].type == 1) {
-				bonuses[i].cooldown = 300;
+				bonuses[i].cooldown = 500;
 				bonuses[i].sprite.visible = false;
 				player.ammoCount += 10;
 				menuAmmoCountText.text = player.ammoCount;
 				menuAmmoCountText.x = menuAmmo.x + menuAmmo.width - menuAmmoCountText.width - 5;
 			}
 			if (bonuses[i].type == 2 && !player.hasKey) {
-				bonuses[i].cooldown = -1;
+				bonuses[i].cooldown = 2000;
 				bonuses[i].sprite.visible = false;
 				player.hasKey = true;
 				menuKey.texture = PIXI.loader.resources["images/menu_key_true.png"].texture;
@@ -861,8 +865,8 @@ function gameOver(delta) {
 		moveRect_2 = Math.round((app.screen.width - player.sprite.x - player.sprite.width / 2) * gameOverCount / 30);
 		moveRect_3 = Math.round((app.screen.height - player.sprite.y - player.sprite.height) * gameOverCount / 30);
 		moveRect_4 = Math.round((player.sprite.x - player.sprite.width / 2) * gameOverCount / 30);
-		gameOverRect.clear();
-		gameOverRect.beginFill(0x000000, 0.8);
+		//gameOverRect.clear();
+		gameOverRect.beginFill(0x000000, 0.15);
 		gameOverRect.drawRect(0, 0, app.screen.width, moveRect_1);
 		gameOverRect.drawRect(app.screen.width - moveRect_2, moveRect_1, moveRect_2, app.screen.height - moveRect_3 - moveRect_1);
 		gameOverRect.drawRect(0, app.screen.height - moveRect_3, app.screen.width, moveRect_3);
