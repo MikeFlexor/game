@@ -857,16 +857,16 @@ function gameOver(delta) {
 		explosions[i].sprite.stop();
 	}
 	
-	if (gameOverCount < 30) {
+	if (gameOverCount < 50) {
 		gameOverCount++;
 		gameOverText.visible = true;
-		gameOverText.y = gameOverCount * 3 - gameOverText.height;
-		moveRect_1 = Math.round(player.sprite.y * gameOverCount / 30);
-		moveRect_2 = Math.round((app.screen.width - player.sprite.x - player.sprite.width / 2) * gameOverCount / 30);
-		moveRect_3 = Math.round((app.screen.height - player.sprite.y - player.sprite.height) * gameOverCount / 30);
-		moveRect_4 = Math.round((player.sprite.x - player.sprite.width / 2) * gameOverCount / 30);
+		gameOverText.y = gameOverCount * 2 - gameOverText.height;
+		moveRect_1 = Math.round(player.sprite.y * gameOverCount / 50);
+		moveRect_2 = Math.round((app.screen.width - player.sprite.x - player.sprite.width / 2) * gameOverCount / 50);
+		moveRect_3 = Math.round((app.screen.height - player.sprite.y - player.sprite.height) * gameOverCount / 50);
+		moveRect_4 = Math.round((player.sprite.x - player.sprite.width / 2) * gameOverCount / 50);
 		//gameOverRect.clear();
-		gameOverRect.beginFill(0x000000, 0.15);
+		gameOverRect.beginFill(0x000000, 0.07);
 		gameOverRect.drawRect(0, 0, app.screen.width, moveRect_1);
 		gameOverRect.drawRect(app.screen.width - moveRect_2, moveRect_1, moveRect_2, app.screen.height - moveRect_3 - moveRect_1);
 		gameOverRect.drawRect(0, app.screen.height - moveRect_3, app.screen.width, moveRect_3);
