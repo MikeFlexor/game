@@ -461,7 +461,7 @@ function setup() {
 	
 	for (let i = 0; i < 16; i++) {
 		let playerRun = PIXI.loader.resources['images/PlayerRunAnim/Run_' + (i) + '.png'].texture;
-		//playerRun.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+		playerRun.baseTexture.scaleMode = PIXI.SCALE_MODES.LINEAR;
 		playerRunTextures.push(playerRun);
 	}
 	
