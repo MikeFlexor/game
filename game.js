@@ -113,7 +113,7 @@ let player = {
 let offsetX = 0;
 let offsetY = 0;
 
-let gameLevel = 6;
+let gameLevel = 1;
 let gameMaxLevel = 7;
 
 let tilingSprite;
