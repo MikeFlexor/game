@@ -354,7 +354,7 @@ function setup() {
 	player.sprite.y = player.y;
 	player.sprite.width = 46;
 	player.sprite.height = 48;
-	player.scale = player.sprite.width / 485;
+	player.scale = 1;
 	app.stage.addChild(player.sprite);
 	
 	menuAmmo = new PIXI.Sprite(PIXI.loader.resources["images/menu_ammo.png"].texture);
