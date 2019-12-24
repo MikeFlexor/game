@@ -113,9 +113,6 @@ let player = {
 let offsetX = 0;
 let offsetY = 0;
 
-let gameLevel = 1;
-let gameMaxLevel = 7;
-
 let tilingSprite;
 let tiles = new PIXI.Container();
 let tilesSprites = [];
@@ -357,8 +354,7 @@ function setup() {
 	player.sprite.y = player.y;
 	player.sprite.width = 46;
 	player.sprite.height = 48;
-	//player.scale = player.sprite.width / 485;
-	player.scale = 1;
+	player.scale = player.sprite.width / 485;
 	app.stage.addChild(player.sprite);
 	
 	menuAmmo = new PIXI.Sprite(PIXI.loader.resources["images/menu_ammo.png"].texture);
@@ -407,7 +403,7 @@ function setup() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 function ShowMessage(setText) {
 	messageLabel.text.text = setText;
-	messageLabel.count = 300;
+	messageLabel.count = 400;
 	messageLabel.text.alpha = 0;
 }
 
@@ -532,8 +528,8 @@ function ChangeMessage(delta) {
 
 	if (messageLabel.count > 0) {
 		messageLabel.count -= delta;
-		if (messageLabel.count > 250) {
-			messageLabel.text.alpha = (300 - messageLabel.count) / 50;
+		if (messageLabel.count > 350) {
+			messageLabel.text.alpha = (400 - messageLabel.count) / 50;
 		} else if (messageLabel.count > 50) {
 			messageLabel.text.alpha = 1;
 		} else {
@@ -883,7 +879,7 @@ function bulletMove(delta) {
 			bullets.splice(i, 1);
 		} else
 		//Вылет пули за границы	карты
-		if ((bullets[i].x < tiles.x) || (bullets[i].x > tiles.width)) {
+		if ((bullets[i].x < tilingSprite.x + offsetX) || (bullets[i].x > tilingSprite.width)) {
 			bullets[i].sprite.parent.removeChild(bullets[i].sprite);
 			bullets.splice(i, 1);
 		}
