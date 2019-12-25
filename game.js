@@ -5,7 +5,9 @@ let appRatio = appSize[0] / appSize[1];
 let renderer = PIXI.autoDetectRenderer(appSize[0], appSize[1], null);
 
 document.body.appendChild(renderer.view);
-//let container = new PIXI.Container();
+
+let menuContainer = new PIXI.Container();
+let showMenu = true;
 
 resize();
 
@@ -173,6 +175,28 @@ let textStyle3 = new PIXI.TextStyle({
 	lineJoin: 'round'
 });
 
+let textStyle4 = new PIXI.TextStyle({
+	fontFamily: 'Tahoma',
+	fontSize: 70,
+	fontWeight: 'bolder',
+	align: 'center',
+	fill: ['#FFFFFF'],
+	stroke: '#CC0000',
+	strokeThickness: 10,
+	lineJoin: 'round'
+});
+
+let textStyle5 = new PIXI.TextStyle({
+	fontFamily: 'Tahoma',
+	fontSize: 70,
+	fontWeight: 'bolder',
+	align: 'center',
+	fill: ['#5599FF'],
+	stroke: '#202020',
+	strokeThickness: 10,
+	lineJoin: 'round'
+});
+
 let gameOverCount = 0;
 let gameOverRect = new PIXI.Graphics();
 
@@ -187,6 +211,41 @@ let messageLabel = {
 ////////// НАЧАЛЬНЫЕ УСТАНОВКИ /////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 function setup() {
+
+
+	menuBackground = new PIXI.extras.TilingSprite(
+		PIXI.loader.resources["images/back.png"].texture,
+		//PIXI.Texture.fromFrame('back.png'),
+		appSize[0],
+		appSize[1]
+	);
+	
+	let startButtonText = new PIXI.Text('Начать игру', textStyle4);
+	startButtonText.x = (app.screen.width - startButtonText.width) / 2;
+	startButtonText.y = 400;
+	startButtonText.interactive = true;
+	startButtonText.on('pointertap', function() {
+		showMenu = false;
+		gameLevel = 1;
+		restart();
+	});
+	startButtonText.on('pointerover', function() {
+		startButtonText.style = textStyle5;
+	});
+	startButtonText.on('pointerout', function() {
+		startButtonText.style = textStyle4;
+	});
+
+	menuContainer.addChild(menuBackground);
+	menuContainer.addChild(startButtonText);
+
+
+
+
+
+
+
+
 	tileCountX = tilesCount[gameLevel * 2 - 2];
 	tileCountY = tilesCount[gameLevel * 2 - 1];
 
@@ -233,6 +292,7 @@ function setup() {
 		let explosion = PIXI.loader.resources['images/explosion_' + (i + 1) + '.png'].texture;
 		//let fire = PIXI.Texture.fromFrame('fire_' + (i + 1) + '.png');
 		explosionTextures.push(explosion);
+		console.log(explosionTextures.length);
 	}
 	
 	for (let i = 0; i < 16; i++) {
@@ -420,9 +480,14 @@ function restart() {
 	
 	tiles.removeChildren();
 	
+	tileMap = [];
 	bullets = [];
 	bonuses = [];
 	doors = [];
+	explosions = [];
+	explosionTextures = [];
+	fireTextures = [];
+	playerRunTextures = [];
 	
 	setup();
 }
@@ -459,6 +524,12 @@ function ChangeOffset() {
 ////////// НАЖАТИЕ КЛАВИШИ /////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 function keyDownHandler(e) {
+
+	if (e.keyCode == 27) {
+		//document.location.replace('index.html');
+		showMenu = !showMenu;
+	}
+
 	if (e.keyCode == 39) {
 		player.moveRight = true;
 		player.moveLeft = false;
@@ -504,13 +575,17 @@ function keyUpHandler(e) {
 ////////// ОБНОВЛЕНИЕ ДАННЫХ ПО ТИКУ ТАЙМЕРА ///////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 function gameUpdate(delta){
-	playerMove(delta);
-	if (player.alive) {
-		bulletMove(delta);
-		bonusesUpdate(delta);
+	if (showMenu) {
+		renderer.render(menuContainer);
+	} else {
+		playerMove(delta);
+		if (player.alive) {
+			bulletMove(delta);
+			bonusesUpdate(delta);
+		}
+		ChangeMessage(delta);
+		renderer.render(app.stage);
 	}
-	ChangeMessage(delta);
-	renderer.render(app.stage);
 }
 
 
