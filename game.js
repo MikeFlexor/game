@@ -6,9 +6,6 @@ let renderer = PIXI.autoDetectRenderer(appSize[0], appSize[1], null);
 
 document.body.appendChild(renderer.view);
 
-let menuContainer = new PIXI.Container();
-let showMenu = true;
-
 resize();
 
 function resize() {
@@ -80,6 +77,8 @@ PIXI.loader.add('images/PlayerRunAnim/Run_15.png');
 
 PIXI.loader.load(setup);
 
+
+
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 
@@ -87,8 +86,14 @@ document.addEventListener("keyup", keyUpHandler, false);
 //music.autoplay = true;
 
 
+let menuContainer = new PIXI.Container();
+let showMenu = true;
+
+
 app.ticker.add(delta => gameUpdate(delta));
 app.ticker.stop();
+
+let gameTime;
 
 let player = {
 	sprite: 0,
@@ -133,6 +138,8 @@ let explosions = [];
 let menuAmmo;
 let menuAmmoCountText;
 let menuKey;
+
+let gameTimeText;
 
 let bonuses = [];
 
@@ -227,6 +234,7 @@ function setup() {
 	startButtonText.on('pointertap', function() {
 		showMenu = false;
 		gameLevel = 1;
+		gameTime = 0;
 		restart();
 	});
 	startButtonText.on('pointerover', function() {
@@ -434,6 +442,11 @@ function setup() {
 	menuAmmoCountText.x = menuAmmo.x + menuAmmo.width - menuAmmoCountText.width - 5;
 	menuAmmoCountText.y = 10;
 	app.stage.addChild(menuAmmoCountText);
+
+	gameTimeText = new PIXI.Text(gameTime, textStyle1);
+	gameTimeText.x = 130
+	gameTimeText.y = 10;
+	app.stage.addChild(gameTimeText);
 	
 	gameOverCount = 0;
 	app.stage.addChild(gameOverRect);
@@ -445,10 +458,8 @@ function setup() {
 	app.stage.addChild(gameOverText);
 
 	messageLabel.text = new PIXI.Text('', textStyle3);
-	//messageLabel.text.x = messageLabel.x;
-	//messageLabel.text.y = messageLabel.y;
 	app.stage.addChild(messageLabel.text);
-	
+
 	ShowMessage(levelMessages[gameLevel - 1]);
 
 	app.ticker.start();
@@ -582,6 +593,8 @@ function gameUpdate(delta){
 		if (player.alive) {
 			bulletMove(delta);
 			bonusesUpdate(delta);
+			gameTime += delta;
+			gameTimeText.text = 'Затрачено времени: ' + Math.round(gameTime / 60);
 		}
 		ChangeMessage(delta);
 		renderer.render(app.stage);
@@ -626,7 +639,7 @@ function playerMove(delta) {
 		if (gameLevel < gameMaxLevel) {
 			gameLevel++;
 		} else {
-			alert('Вы выиграли!');
+			showMenu = true;
 			gameLevel = 1;
 		}
 		restart();
@@ -708,7 +721,7 @@ function playerMove(delta) {
 				}
 			}
 			if (tileMap[i][Math.floor((player.nextX - player.w / 2) / tileSize)] == 8) {
-				player.alive = false;
+				//player.alive = false;
 				ShowMessage('Для рестарта нажмите любую клавишу!');
 			}
 			if (tileMap[i][Math.floor((player.nextX - player.w / 2) / tileSize)] == 9) {
@@ -740,7 +753,7 @@ function playerMove(delta) {
 				}
 			} 
 			if (tileMap[i][Math.floor((player.nextX + player.w / 2) / tileSize)] == 8) {
-				player.alive = false;
+				//player.alive = false;
 				ShowMessage('Для рестарта нажмите любую клавишу!');
 			}
 			if (tileMap[i][Math.floor((player.nextX + player.w / 2) / tileSize)] == 9) {
@@ -761,7 +774,7 @@ function playerMove(delta) {
 				col = true;
 			}
 			if (tileMap[Math.floor(player.nextY / tileSize)][j] == 8) {
-				player.alive = false;
+				//player.alive = false;
 				ShowMessage('Для рестарта нажмите любую клавишу!');
 			}
 			if (tileMap[Math.floor(player.nextY / tileSize)][j] == 9) {
@@ -779,7 +792,7 @@ function playerMove(delta) {
 				col = true;
 			}
 			if (tileMap[Math.floor((player.nextY + player.h) / tileSize)][j] == 8) {
-				player.alive = false;
+				//player.alive = false;
 				ShowMessage('Для рестарта нажмите любую клавишу!');
 			}
 			if (tileMap[Math.floor((player.nextY + player.h) / tileSize)][j] == 9) {
@@ -844,9 +857,9 @@ function bulletAdd() {
 	bullet.sprite.x = bullet.x;
 	bullet.sprite.y = bullet.y;
 	if (player.directionLeft) {
-		bullet.dX = -10;
+		bullet.dX = -8;
 	} else {
-		bullet.dX = 10;
+		bullet.dX = 8;
 	}
 	tiles.addChild(bullet.sprite);
 	bullets.push(bullet);
@@ -890,22 +903,12 @@ function bulletMove(delta) {
 		
 		//Попадание в бетон
 		if (tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] == 1) {
-			/*if (bullets[i].dX > 0) {
-				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize, bullets[i].y);
-			} else {
-				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize + tileSize, bullets[i].y);
-			}*/
 			explosionAdd(bullets[i].x, bullets[i].y);
 			bullets[i].sprite.parent.removeChild(bullets[i].sprite);
 			bullets.splice(i, 1);
 		} else 
 		//Попадание в дверь
 		if (tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] > 1 && tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] < 5) {
-			/*if (bullets[i].dX > 0) {
-				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize, bullets[i].y);
-			} else {
-				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize + tileSize, bullets[i].y);
-			}*/
 			explosionAdd(bullets[i].x, bullets[i].y);
 			bullets[i].sprite.parent.removeChild(bullets[i].sprite);
 			bullets.splice(i, 1);
@@ -913,14 +916,8 @@ function bulletMove(delta) {
 		//Попадание в кирпич
 		if (tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] == 5) {
 			tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] = 6;			
-			//tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.loader.resources["images/Кирпич_2.png"].texture;
 			tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.loader.resources["images/brick_2.png"].texture;
 			//tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.Texture.fromFrame('brick_2.png');
-			/*if (bullets[i].dX > 0) {
-				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize, bullets[i].y);
-			} else {
-				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize + tileSize, bullets[i].y);
-			}*/
 			explosionAdd(bullets[i].x, bullets[i].y);
 			bullets[i].sprite.parent.removeChild(bullets[i].sprite);
 			bullets.splice(i, 1);
@@ -928,14 +925,8 @@ function bulletMove(delta) {
 		//Попадание в полуразрушенный кирпич
 		if (tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] == 6) {
 			tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] = 7;			
-			//tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.loader.resources["images/Кирпич_3.png"].texture;
 			tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.loader.resources["images/brick_3.png"].texture;
 			//tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].texture = PIXI.Texture.fromFrame('brick_3.png');
-			/*if (bullets[i].dX > 0) {
-				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize, bullets[i].y);
-			} else {
-				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize + tileSize, bullets[i].y);
-			}*/
 			explosionAdd(bullets[i].x, bullets[i].y);
 			bullets[i].sprite.parent.removeChild(bullets[i].sprite);
 			bullets.splice(i, 1);
@@ -944,11 +935,6 @@ function bulletMove(delta) {
 		if (tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] == 7) {
 			tileMap[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)] = 0;			
 			tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)].parent.removeChild(tilesSprites[Math.floor(bullets[i].y / tileSize)][Math.floor(bullets[i].x / tileSize)]);
-			/*if (bullets[i].dX > 0) {
-				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize, bullets[i].y);
-			} else {
-				explosionAdd(Math.floor(bullets[i].x / tileSize) * tileSize + tileSize, bullets[i].y);
-			}*/
 			explosionAdd(bullets[i].x, bullets[i].y);
 			bullets[i].sprite.parent.removeChild(bullets[i].sprite);
 			bullets.splice(i, 1);
@@ -966,11 +952,6 @@ function bulletMove(delta) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 function bonusesUpdate(delta) {
 	for (let i = 0; i < bonuses.length; i++) {
-		/*if (bonuses[i].sway < 62) {
-			bonuses[i].sway += delta;
-		} else {
-			bonuses[i].sway = 0;
-		}*/
 		bonuses[i].sway += delta;
 		bonuses[i].dY = Math.sin(bonuses[i].sway / 30);
 		bonuses[i].sprite.x = bonuses[i].x - offsetX;
@@ -1039,7 +1020,6 @@ function gameOver(delta) {
 		moveRect_2 = Math.round((app.screen.width - player.sprite.x - player.sprite.width / 2) * gameOverCount / 50);
 		moveRect_3 = Math.round((app.screen.height - player.sprite.y - player.sprite.height) * gameOverCount / 50);
 		moveRect_4 = Math.round((player.sprite.x - player.sprite.width / 2) * gameOverCount / 50);
-		//gameOverRect.clear();
 		gameOverRect.beginFill(0x000000, 0.07);
 		gameOverRect.drawRect(0, 0, app.screen.width, moveRect_1);
 		gameOverRect.drawRect(app.screen.width - moveRect_2, moveRect_1, moveRect_2, app.screen.height - moveRect_3 - moveRect_1);
