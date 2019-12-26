@@ -721,7 +721,7 @@ function playerMove(delta) {
 				}
 			}
 			if (tileMap[i][Math.floor((player.nextX - player.w / 2) / tileSize)] == 8) {
-				//player.alive = false;
+				player.alive = false;
 				ShowMessage('Для рестарта нажмите любую клавишу!');
 			}
 			if (tileMap[i][Math.floor((player.nextX - player.w / 2) / tileSize)] == 9) {
@@ -753,7 +753,7 @@ function playerMove(delta) {
 				}
 			} 
 			if (tileMap[i][Math.floor((player.nextX + player.w / 2) / tileSize)] == 8) {
-				//player.alive = false;
+				player.alive = false;
 				ShowMessage('Для рестарта нажмите любую клавишу!');
 			}
 			if (tileMap[i][Math.floor((player.nextX + player.w / 2) / tileSize)] == 9) {
@@ -774,7 +774,7 @@ function playerMove(delta) {
 				col = true;
 			}
 			if (tileMap[Math.floor(player.nextY / tileSize)][j] == 8) {
-				//player.alive = false;
+				player.alive = false;
 				ShowMessage('Для рестарта нажмите любую клавишу!');
 			}
 			if (tileMap[Math.floor(player.nextY / tileSize)][j] == 9) {
@@ -792,7 +792,7 @@ function playerMove(delta) {
 				col = true;
 			}
 			if (tileMap[Math.floor((player.nextY + player.h) / tileSize)][j] == 8) {
-				//player.alive = false;
+				player.alive = false;
 				ShowMessage('Для рестарта нажмите любую клавишу!');
 			}
 			if (tileMap[Math.floor((player.nextY + player.h) / tileSize)][j] == 9) {
